@@ -88,7 +88,8 @@ function useParallax() {
 }
 /* ================= Tự cuộn tới cuối trang (giống bản gốc) =================
    - Bắt đầu ~1.2s sau khi trang thiệp hiện, tốc độ 50px/giây, dừng ở cuối trang.
-   - Chạm/bấm vào thiệp: bật/tắt tự cuộn. Cuộn tay (lăn chuột, vuốt, phím): dừng. */
+   - Chạm vào nội dung thiệp: bật/tắt tự cuộn (bấm nút nhạc, nút, link, ô nhập… không ảnh hưởng).
+   - Cuộn tay (lăn chuột, vuốt, phím): dừng. */
 function useAutoScroll(enabled) {
   const st = useRef({ on: false, pos: 0, last: 0, raf: 0 });
   useEffect(() => {
@@ -105,9 +106,11 @@ function useAutoScroll(enabled) {
     };
     const start = () => { if (s.on || window.scrollY >= max() - 1) return; s.on = true; s.pos = window.scrollY; s.last = 0; s.raf = requestAnimationFrame(loop); };
     const stop = () => { s.on = false; if (s.raf) cancelAnimationFrame(s.raf); s.raf = 0; };
-    const toggle = () => (s.on ? stop() : start());
+    // Chỉ bật/tắt khi chạm vào nội dung thiệp; bỏ qua nút nhạc, nút, link, ô nhập, hộp thoại, ảnh phóng to
+    const IGNORE = '.music, button, a, input, textarea, select, label, dialog, iframe, .lb';
+    const toggle = (e) => { if (e.target.closest(IGNORE)) return; s.on ? stop() : start(); };
     const manual = () => stop();
-    const onKey = (e) => { if (['ArrowDown', 'ArrowUp', 'PageDown', 'PageUp', 'Home', 'End', ' '].includes(e.key)) stop(); };
+    const onKey = (e) => { if (e.target.closest?.('input, textarea, select, [contenteditable]')) return; if (['ArrowDown', 'ArrowUp', 'PageDown', 'PageUp', 'Home', 'End', ' '].includes(e.key)) stop(); };
     const root = document.querySelector('.inv');
     const startTimer = setTimeout(start, 1200);
     root?.addEventListener('click', toggle);

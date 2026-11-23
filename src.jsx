@@ -21,12 +21,30 @@ const DATA = {
 const BASE = import.meta.env.BASE_URL; // '/' khi dev, '/weddinginvitation/' trên GitHub Pages
 const T = `${BASE}images/themes/minimalism-green/`;
 const PHOTOS = Array.from({ length: 11 }, (_, i) => `${BASE}images/photos/album-${String(i + 1).padStart(2, '0')}.jpg`);
+const G = 'Hải Dương', B = 'Trần Hảo';
 const WISHES = [
-  'Chúc hai bạn trăm năm hạnh phúc, sớm sinh quý tử!',
-  'Chúc cô dâu chú rể mãi yêu thương, cùng nhau đi hết con đường phía trước.',
-  'Chúc mừng hạnh phúc! Mong hai bạn luôn bình an và tràn đầy tiếng cười.',
-  'Chúc tổ ấm nhỏ luôn ấm áp, thuận hòa và viên mãn.',
+  `Chúc ${G} và ${B} trăm năm hạnh phúc, đầu bạc răng long!`,
+  `Chúc ${G} và ${B} một đời bình an, luôn nắm tay nhau qua mọi thăng trầm.`,
+  `Chúc mừng ${G} và ${B}! Mong tổ ấm nhỏ của hai bạn luôn ngập tràn tiếng cười.`,
+  `Chúc ${B} và ${G} mãi yêu thương, thấu hiểu và trân trọng nhau như ngày đầu.`,
+  `Chúc hai bạn ${G}, ${B} sớm có thiên thần nhỏ, gia đình thêm viên mãn.`,
+  `Chúc tình yêu của ${G} và ${B} luôn ấm áp, bền chặt theo năm tháng.`,
+  `Chúc ${G} và ${B} cùng nhau đi hết con đường phía trước, luôn là chỗ dựa vững chắc cho nhau.`,
+  `Hạnh phúc nhé ${G} và ${B}! Chúc hai bạn luôn vui vẻ, khỏe mạnh và thành công.`,
+  `Chúc ${B} và ${G} xây dựng một gia đình thuận hòa, êm ấm và đủ đầy.`,
+  `Chúc mừng ngày vui của ${G} và ${B}. Mong mỗi ngày bên nhau đều là một ngày đẹp.`,
+  `Chúc ${G} và ${B} luôn giữ được nụ cười và sự dịu dàng dành cho nhau.`,
+  `Chúc hai bạn ${G}, ${B} bách niên giai lão, vạn sự như ý!`,
+  `Chúc ${G} và ${B} tình nồng ý hợp, cùng nhau vun đắp hạnh phúc trọn đời.`,
+  `Chúc mừng ${B} và ${G}! Mong tình yêu của hai bạn luôn đong đầy như hôm nay.`,
+  `Chúc ${G} và ${B} có một hành trình hôn nhân thật nhiều kỷ niệm đẹp.`,
+  `Chúc ${G} và ${B} luôn bao dung, sẻ chia và cùng nhau lớn lên mỗi ngày.`,
+  `Chúc hai bạn ${G} và ${B} hạnh phúc viên mãn, sớm sinh quý tử.`,
+  `Chúc tổ ấm của ${G} và ${B} luôn bình yên, là nơi cả hai muốn trở về.`,
+  `Chúc ${B} và ${G} mãi là bạn đồng hành tuyệt vời nhất của nhau.`,
+  `Chúc mừng hạnh phúc ${G} và ${B}! Chúc hai bạn yêu nhau trọn đời, trọn kiếp.`,
 ];
+const pickWishes = (n = 5) => [...WISHES].sort(() => Math.random() - 0.5).slice(0, n);
 const calendarUrl = () => {
   const p = new URLSearchParams({
     action: 'TEMPLATE', text: `Đám cưới ${DATA.groom} & ${DATA.bride}`, dates: '20261211T080000Z/20261211T100000Z',
@@ -473,6 +491,7 @@ function Guestbook() {
   const [list, setList] = useState(() => load('wishes', []));
   const [name, setName] = useState('');
   const [msg, setMsg] = useState('');
+  const [suggest, setSuggest] = useState(null);
   const fmt = (t) => { const d = new Date(t); const p = (x) => String(x).padStart(2, '0'); return `${p(d.getHours())}:${p(d.getMinutes())}:${p(d.getSeconds())} ${d.getDate()}/${d.getMonth() + 1}/${d.getFullYear()}`; };
   const submit = (e) => {
     e.preventDefault();
@@ -494,7 +513,7 @@ function Guestbook() {
             <textarea placeholder="Nhập lời chúc*" className="gb__input gb__ta" rows={4} maxLength={10000} required value={msg} onChange={(e) => setMsg(e.target.value)} style={{ ...inp, resize: 'none' }} />
             <div className="gb__actions">
               <div className="gb__tools">
-                <button type="button" className="gb__magic" title="Gợi ý lời chúc" onClick={() => setMsg(WISHES[Math.floor(Math.random() * WISHES.length)])} style={{ backgroundColor: 'rgba(107, 123, 79, 0.1)', color: INK }}>🪄</button>
+                <button type="button" className="gb__magic" title="Gợi ý lời chúc" onClick={() => setSuggest(pickWishes())} style={{ backgroundColor: 'rgba(107, 123, 79, 0.1)', color: INK }}>🪄</button>
               </div>
               <button type="submit" className="gb__send" style={{ backgroundColor: INK }}><D>GỬI LỜI CHÚC</D></button>
             </div>
@@ -509,7 +528,34 @@ function Guestbook() {
           )) : <p className="gb__empty">Chưa có lời chúc nào. Hãy là người đầu tiên!</p>}
         </div>
       </section>
+      {suggest && <WishModal wishes={suggest} onPick={(w) => { setMsg(w); setSuggest(null); }} onClose={() => setSuggest(null)} />}
     </div>
+  );
+}
+
+function WishModal({ wishes, onPick, onClose }) {
+  const ref = useRef(null);
+  useEffect(() => { ref.current?.showModal(); }, []);
+  return (
+    <dialog ref={ref} className="wm" onClose={onClose} onClick={(e) => { if (e.target === ref.current) ref.current.close(); }}>
+      <div className="wm__box">
+        <div className="wm__head">
+          <h3 className="wm__title">✨ Lời chúc gợi ý cho bạn</h3>
+          <button type="button" className="wm__x" aria-label="Đóng" onClick={() => ref.current.close()}>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M18 6 6 18M6 6l12 12" /></svg>
+          </button>
+        </div>
+        <p className="wm__sub">Chọn một lời chúc bạn thích</p>
+        <div className="wm__list">
+          {wishes.map((w) => (
+            <button type="button" key={w} className="wm__item" onClick={() => onPick(w)}><p>{w}</p></button>
+          ))}
+        </div>
+        <div className="wm__foot">
+          <button type="button" className="wm__close" onClick={() => ref.current.close()}>Đóng</button>
+        </div>
+      </div>
+    </dialog>
   );
 }
 

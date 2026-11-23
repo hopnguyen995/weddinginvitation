@@ -1,0 +1,10 @@
+node_modules/
+dist/
+.env
+.DS_Store
+# công cụ dev / dữ liệu tạm khi clone
+_capture/
+# font & ảnh cũ không còn dùng
+public/fonts/*.ttf
+public/images/cover.jpg
+public/images/cover2.jpg

@@ -4,7 +4,7 @@ import './style.css';
 
 /* ================= Nội dung thiệp (giữ nguyên text của bạn) =================
  * Hai phiên bản thiệp, chọn bằng tham số trên link:
- *   ?side=groom (mặc định) → thiệp nhà trai
+ *   /nha-trai/ hoặc link gốc (mặc định) → thiệp nhà trai
  *   ?side=bride hoặc /nha-gai/ → thiệp nhà gái (nên dùng /nha-gai/ để ảnh xem trước đúng)
  * Kết hợp với tên khách: ?side=bride&to=Anh+Nam
  */
@@ -26,8 +26,9 @@ const PATH = (() => {
     let p = decodeURIComponent(window.location.pathname);
     if (p.startsWith(base)) p = p.slice(base.length);
     const parts = p.split('/').map((x) => x.trim()).filter((x) => x && x !== 'index.html');
-    const bride = parts[0] && parts[0].toLowerCase() === 'nha-gai';
-    if (bride) parts.shift();
+    const first = (parts[0] || '').toLowerCase();
+    const bride = first === 'nha-gai';
+    if (bride || first === 'nha-trai') parts.shift();
     return { bride, name: parts.join(' ') };
   } catch { return { bride: false, name: '' }; }
 })();

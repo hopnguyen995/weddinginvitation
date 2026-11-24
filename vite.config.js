@@ -29,6 +29,7 @@ export default defineConfig({
     rollupOptions: {
       input: {
         main: resolve(ROOT, 'index.html'),       // thiệp nhà trai
+        groom: resolve(ROOT, 'nha-trai/index.html'), // thiệp nhà trai (/nha-trai/)
         bride: resolve(ROOT, 'nha-gai/index.html'), // thiệp nhà gái
       },
     },

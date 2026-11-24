@@ -1,3 +1,4 @@
 # Netlify: link dạng /anh-nam hoặc /nha-gai/anh-nam vẫn mở thiệp (trả mã 200, có ảnh xem trước)
-/nha-gai/*  /nha-gai/index.html  200
+/nha-trai/*  /nha-trai/index.html  200
+/nha-gai/*   /nha-gai/index.html   200
 /*          /index.html          200

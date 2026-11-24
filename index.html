@@ -3,6 +3,13 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <script>
+      // Link gốc → chuyển sang thiệp nhà trai, giữ nguyên tên khách (?anh nam)
+      (function () {
+        var b = '%BASE_URL%', p = location.pathname;
+        if (p === b || p === b + 'index.html') location.replace(b + 'nha-trai/' + location.search + location.hash);
+      })();
+    </script>
     <title>Hải Dương &amp; Trần Hảo</title>
     <meta name="description" content="Trân trọng kính mời bạn tới dự lễ cưới của Hải Dương &amp; Trần Hảo – 12 tháng 12, 2026" />
     <meta property="og:title" content="Thiệp cưới Hải Dương &amp; Trần Hảo" />

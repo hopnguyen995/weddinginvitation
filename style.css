@@ -365,3 +365,7 @@ a{color:inherit;text-decoration:inherit}
 }
 
 .rsvp__err{margin:12px 0 0;color:#b42318;font-size:13px;text-align:center}
+
+/* Khóa cuộn trang khi mở ảnh phóng to */
+html.modal-open, html.modal-open body{overflow:hidden;overscroll-behavior:none}
+.lb{overscroll-behavior:contain;touch-action:pan-x pinch-zoom}

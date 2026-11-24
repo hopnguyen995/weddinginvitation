@@ -1,4 +1,5 @@
 import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { createRoot } from 'react-dom/client';
 import './style.css';
 
@@ -191,8 +192,11 @@ function useAutoScroll(enabled) {
     if (!enabled) return;
     const s = st.current;
     const max = () => document.documentElement.scrollHeight - window.innerHeight;
+    const paused = () => document.documentElement.classList.contains('modal-open') || !!document.querySelector('dialog[open]');
     const loop = (t) => {
       if (!s.on) { s.raf = 0; return; }
+      if (paused()) { s.last = 0; s.raf = requestAnimationFrame(loop); return; } // đang mở ảnh/hộp thoại: đứng yên
+      if (s.last === 0) s.pos = window.scrollY;
       const dt = s.last ? (t - s.last) / 1000 : 0; s.last = t;
       s.pos = Math.min(max(), s.pos + 50 * dt);
       window.scrollTo(0, s.pos);
@@ -202,9 +206,9 @@ function useAutoScroll(enabled) {
     const start = () => { if (s.on || window.scrollY >= max() - 1) return; s.on = true; s.pos = window.scrollY; s.last = 0; s.raf = requestAnimationFrame(loop); };
     const stop = () => { s.on = false; if (s.raf) cancelAnimationFrame(s.raf); s.raf = 0; };
     // Chỉ bật/tắt khi chạm vào nội dung thiệp; bỏ qua nút nhạc, nút, link, ô nhập, hộp thoại, ảnh phóng to
-    const IGNORE = '.music, button, a, input, textarea, select, label, dialog, iframe, .lb';
+    const IGNORE = '.music, button, a, input, textarea, select, label, dialog, iframe, .lb, .alb__stage';
     const toggle = (e) => { if (e.target.closest(IGNORE)) return; s.on ? stop() : start(); };
-    const manual = () => stop();
+    const manual = () => { if (!paused()) stop(); };
     const onKey = (e) => { if (e.target.closest?.('input, textarea, select, [contenteditable]')) return; if (['ArrowDown', 'ArrowUp', 'PageDown', 'PageUp', 'Home', 'End', ' '].includes(e.key)) stop(); };
     const root = document.querySelector('.inv');
     const startTimer = setTimeout(start, 1200);
@@ -440,6 +444,14 @@ function Album() {
   useEffect(() => {
     PHOTOS.forEach((src, k) => { const im = new Image(); im.onload = () => setRatios((r) => { const c = [...r]; c[k] = im.naturalWidth / im.naturalHeight; return c; }); im.src = src; });
   }, []);
+  const isOpen = box !== null;
+  useEffect(() => {
+    if (!isOpen) return;
+    // Khóa cuộn trang + tạm dừng tự cuộn khi đang xem ảnh phóng to
+    const html = document.documentElement;
+    html.classList.add('modal-open');
+    return () => html.classList.remove('modal-open');
+  }, [isOpen]);
   useEffect(() => {
     if (box === null) return;
     const onKey = (e) => { if (e.key === 'Escape') setBox(null); if (e.key === 'ArrowRight') setBox((b) => (b + 1) % n); if (e.key === 'ArrowLeft') setBox((b) => (b - 1 + n) % n); };
@@ -478,7 +490,7 @@ function Album() {
           ))}
         </div>
       </div>
-      {box !== null && (
+      {box !== null && createPortal(
         <div className="lb" onClick={() => setBox(null)}>
           <button type="button" aria-label="Close lightbox" className="lb__close" onClick={() => setBox(null)}>✕</button>
           <div className="lb__count">{box + 1} / {n}</div>
@@ -490,7 +502,8 @@ function Album() {
               <button type="button" key={src} aria-label={`View image ${k + 1}`} className={k === box ? 'on' : ''} onClick={() => setBox(k)}><img alt="" src={src} /></button>
             ))}
           </div>
-        </div>
+        </div>,
+        document.body,
       )}
     </div>
   );

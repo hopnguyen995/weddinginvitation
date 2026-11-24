@@ -2,20 +2,58 @@ import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import './style.css';
 
-/* ================= Nội dung thiệp (giữ nguyên text của bạn) ================= */
+/* ================= Nội dung thiệp (giữ nguyên text của bạn) =================
+ * Hai phiên bản thiệp, chọn bằng tham số trên link:
+ *   ?side=groom (mặc định) → thiệp nhà trai
+ *   ?side=bride            → thiệp nhà gái
+ * Kết hợp với tên khách: ?side=bride&to=Anh+Nam
+ */
+const SIDE = (() => {
+  try {
+    const q = new URLSearchParams(window.location.search);
+    return (q.get('side') || '').toLowerCase() === 'bride' || q.has('bride') ? 'bride' : 'groom';
+  } catch { return 'groom'; }
+})();
+
+const PEOPLE = {
+  groom: { short: 'Hải Dương', full: 'Trần Hải Dương', photo: 'groom.jpg' },
+  bride: { short: 'Trần Hảo', full: 'Trần Thị Quang Hảo', photo: 'bride.jpg' },
+};
+const FAMILIES = {
+  groom: { title: 'Ông Bà', father: 'Trần Đình Đông', mother: 'Trần Thị Thúy Hằng', address: 'Đông Thành- Hát Môn- Hà Nội' },
+  bride: { title: 'Ông Bà', father: 'Trần Quang Tài', mother: 'Nguyễn Thị Ngọc Hạnh', address: 'Tiền Giang- Hát Môn- Hà Nội' },
+};
+
+/* Thông tin riêng từng bên */
+const SIDES = {
+  groom: {
+    dateLabel: '12 tháng 12, 2026',
+    ceremony: { place: 'LỄ THÀNH HÔN ĐƯỢC CỬ HÀNH TẠI\nTƯ GIA NHÀ TRAI', time: '10:30', weekday: 'THỨ BẢY', day: '12', month: 'THÁNG 12', year: '2026', lunar: '(Tức ngày 4 tháng 11 năm Bính\u00a0Ngọ)' },
+    party: { time: '15:00', weekday: 'THỨ SÁU', day: '11', month: 'THÁNG 12', year: '2026', lunar: '(Tức ngày 3 tháng 11 năm Bính\u00a0Ngọ)', start: '2026-12-11T15:00:00+07:00' },
+    announce: ['TRÂN TRỌNG KÍNH MỜI TỚI DỰ', 'LỄ THÀNH HÔN CỦA CÁC CON CHÚNG TÔI'],
+    venue: 'Sân Phủ Quận Công',
+    geo: '21.128544,105.617632', // https://maps.app.goo.gl/qjKgnASKjhUFGdQy8 (Phủ Quận Công Nguyễn Ngọc Trì)
+  },
+  bride: {
+    dateLabel: '12 tháng 12, 2026',
+    ceremony: { place: 'LỄ VU QUY ĐƯỢC CỬ HÀNH TẠI\nTƯ GIA NHÀ GÁI', time: '09:00', weekday: 'THỨ BẢY', day: '12', month: 'THÁNG 12', year: '2026', lunar: '(Tức ngày 4 tháng 11 năm Bính\u00a0Ngọ)' },
+    party: { time: '16:00', weekday: 'THỨ SÁU', day: '11', month: 'THÁNG 12', year: '2026', lunar: '(Tức ngày 3 tháng 11 năm Bính\u00a0Ngọ)', start: '2026-12-11T16:00:00+07:00' },
+    announce: ['TRÂN TRỌNG KÍNH MỜI TỚI DỰ', 'LỄ VU QUY CỦA CÁC CON CHÚNG TÔI'],
+    venue: 'Trung Tâm Văn Hoá - Thể Thao Xã Hát Môn',
+    geo: '21.1280849,105.6159094', // https://maps.app.goo.gl/JbsvQxawdd8RDDKT6
+  },
+};
+
+const OTHER = SIDE === 'bride' ? 'groom' : 'bride';
+/* Bên phát thiệp đứng trước: tên, ảnh, gia đình */
+const COUPLE = [PEOPLE[SIDE], PEOPLE[OTHER]];
 const DATA = {
-  groomShort: 'Hải Dương',
-  brideShort: 'Trần Hảo',
-  groom: 'Trần Hải Dương',
-  bride: 'Trần Thị Quang Hảo',
-  dateLabel: '12 tháng 12, 2026',
-  families: [
-    { title: 'Ông Bà', father: 'Trần Đình Đông', mother: 'Trần Thị Thúy Hằng', address: 'Đông Thành- Hát Môn- Hà Nội' },
-    { title: 'Ông Bà', father: 'Trần Quang Tài', mother: 'Nguyễn Thị Ngọc Hạnh', address: 'Tiền Giang- Hát Môn- Hà Nội' },
-  ],
-  ceremony: { place: 'LỄ THÀNH HÔN ĐƯỢC CỬ HÀNH TẠI\nTƯ GIA NHÀ TRAI', time: '10:30', weekday: 'THỨ BẢY', day: '12', month: 'THÁNG 12', year: '2026', lunar: '(Tức ngày 4 tháng 11 năm Bính Ngọ)' },
-  party: { time: '15:00', weekday: 'THỨ SÁU', day: '11', month: 'THÁNG 12', year: '2026', lunar: '(Tức ngày 3 tháng 11 năm Bính Ngọ)', start: '2026-12-11T15:00:00+07:00' },
-  venue: 'Sân Phủ Quận Công',
+  ...SIDES[SIDE],
+  groomShort: PEOPLE.groom.short,
+  brideShort: PEOPLE.bride.short,
+  groom: PEOPLE.groom.full,
+  bride: PEOPLE.bride.full,
+  families: [FAMILIES[SIDE], FAMILIES[OTHER]],
   music: `${import.meta.env.BASE_URL}music/song.mp3`, // file nhạc: public/music/song.mp3
 };
 const BASE = import.meta.env.BASE_URL; // '/' khi dev, '/weddinginvitation/' trên GitHub Pages
@@ -45,14 +83,18 @@ const WISHES = [
   `Chúc mừng hạnh phúc ${G} và ${B}! Chúc hai bạn yêu nhau trọn đời, trọn kiếp.`,
 ];
 const pickWishes = (n = 5) => [...WISHES].sort(() => Math.random() - 0.5).slice(0, n);
+const calDates = (iso) => {
+  const f = (d) => d.toISOString().replace(/[-:]|\.\d{3}/g, '');
+  const a = new Date(iso); return `${f(a)}/${f(new Date(a.getTime() + 2 * 36e5))}`;
+};
 const calendarUrl = () => {
   const p = new URLSearchParams({
-    action: 'TEMPLATE', text: `Đám cưới ${DATA.groom} & ${DATA.bride}`, dates: '20261211T080000Z/20261211T100000Z',
+    action: 'TEMPLATE', text: `Đám cưới ${DATA.groom} & ${DATA.bride}`, dates: calDates(DATA.party.start),
     ctz: 'Asia/Saigon', details: `Tiệc cưới của ${DATA.groom} & ${DATA.bride} tại ${DATA.venue}`, location: DATA.venue,
   });
   return `https://www.google.com/calendar/render?${p.toString().replace(/\+/g, '%20')}`;
 };
-const VENUE_GEO = '21.128544,105.617632'; // https://maps.app.goo.gl/qjKgnASKjhUFGdQy8 (Phủ Quận Công Nguyễn Ngọc Trì)
+const VENUE_GEO = DATA.geo;
 const mapsUrl = `https://www.google.com/maps/dir/?api=1&destination=${VENUE_GEO}`;
 const mapEmbed = `https://maps.google.com/maps?q=${VENUE_GEO}&z=16&output=embed`;
 /* Tên khách mời lấy từ link: ?to=Anh%20Nam  →  "Thân Mời Anh Nam" */
@@ -201,9 +243,9 @@ function Cover({ onOpen, phase }) {
             </div>
             <div className="cover__content">
               <h1 className="cover__names" style={{ color: '#6b7b4f', fontFamily: F.ebg }}>
-                <span>{DATA.groomShort}</span>
+                <span>{COUPLE[0].short}</span>
                 <span className="cover__amp" style={{ fontFamily: F.bask }}>&amp;</span>
-                <span>{DATA.brideShort}</span>
+                <span>{COUPLE[1].short}</span>
               </h1>
               <div className="cover__divider">
                 <div style={{ background: 'linear-gradient(to right, transparent, #6b7b4f)' }} />
@@ -250,27 +292,27 @@ function Header({ y }) {
       <div className="hdr__env">
         <img alt="" aria-hidden="true" className="hdr__env-back" src={`${T}envelope.webp`} />
         <div className="hdr__photo hdr__photo--g" style={{ animation: '4s ease-in-out 0s infinite normal none running mgFloatG' }}>
-          <div className="hdr__frame"><img alt={DATA.groomShort} src={`${BASE}images/photos/groom.jpg`} /></div>
+          <div className="hdr__frame"><img alt={PEOPLE.groom.short} src={`${BASE}images/photos/groom.jpg`} /></div>
         </div>
         <div className="hdr__photo hdr__photo--b" style={{ animation: '4.6s ease-in-out 0s infinite normal none running mgFloatB' }}>
-          <div className="hdr__frame"><img alt={DATA.brideShort} src={`${BASE}images/photos/bride.jpg`} /></div>
+          <div className="hdr__frame"><img alt={PEOPLE.bride.short} src={`${BASE}images/photos/bride.jpg`} /></div>
         </div>
         <img alt="" aria-hidden="true" className="hdr__env-cut" src={`${T}envelope-cut.webp`} />
       </div>
       <div className="hdr__names">
-        <p style={{ fontFamily: F.times, color: INK }}>{DATA.groomShort}</p>
+        <p style={{ fontFamily: F.times, color: INK }}>{COUPLE[0].short}</p>
         <span aria-hidden="true" className="hdr__amp" style={{ fontFamily: F.naut, color: 'rgba(107, 123, 79, 0.15)' }}>&amp;</span>
-        <p style={{ fontFamily: F.times, color: INK }}>{DATA.brideShort}</p>
+        <p style={{ fontFamily: F.times, color: INK }}>{COUPLE[1].short}</p>
       </div>
       <img alt="" aria-hidden="true" className="flower-line hdr__line2" src={`${T}flower-line.webp`} />
     </header>
   );
 }
 
-const ANNOUNCE = ['TRÂN TRỌNG KÍNH MỜI TỚI DỰ', 'LỄ THÀNH HÔN CỦA CÁC CON CHÚNG TÔI'];
+const ANNOUNCE = DATA.announce;
 
 function Ceremony() {
-  const [nameSize, setNameRef] = useFitGroup(42, [DATA.groom, DATA.bride]);
+  const [nameSize, setNameRef] = useFitGroup(42, [COUPLE[0].full, COUPLE[1].full]);
   const [annSize, setAnnRef] = useFitGroup(22, ANNOUNCE, 10);
   const [addrSize, setAddrRef] = useFitGroup(10, DATA.families.map((f) => f.address), 7);
   const [parentSize, setParentRef] = useFitGroup(14, DATA.families.flatMap((f) => [f.father, f.mother]), 10);
@@ -302,10 +344,10 @@ function Ceremony() {
             ))}
           </div>
           <div className="couple">
-            <h3 ref={setNameRef(0)} className="couple-name" style={{ fontSize: nameSize, fontFamily: F.viaoda, color: '#fff' }}>{DATA.groom}</h3>
+            <h3 ref={setNameRef(0)} className="couple-name" style={{ fontSize: nameSize, fontFamily: F.viaoda, color: '#fff' }}>{COUPLE[0].full}</h3>
             <div className="couple__label" style={{ color: W7, fontFamily: F.bask, letterSpacing: '0.1em' }}><D>{''}</D></div>
             <div className="couple__amp" style={{ color: W, fontFamily: F.times }}>&amp;</div>
-            <h3 ref={setNameRef(1)} className="couple-name" style={{ fontSize: nameSize, fontFamily: F.viaoda, color: '#fff' }}>{DATA.bride}</h3>
+            <h3 ref={setNameRef(1)} className="couple-name" style={{ fontSize: nameSize, fontFamily: F.viaoda, color: '#fff' }}>{COUPLE[1].full}</h3>
             <div className="couple__label" style={{ color: W7, fontFamily: F.bask, letterSpacing: '0.1em' }}><D>{''}</D></div>
           </div>
           <div className="when" style={{ fontFamily: F.bask }}>

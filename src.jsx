@@ -55,6 +55,9 @@ const calendarUrl = () => {
 const VENUE_GEO = '21.128544,105.617632'; // https://maps.app.goo.gl/qjKgnASKjhUFGdQy8 (Phủ Quận Công Nguyễn Ngọc Trì)
 const mapsUrl = `https://www.google.com/maps/dir/?api=1&destination=${VENUE_GEO}`;
 const mapEmbed = `https://maps.google.com/maps?q=${VENUE_GEO}&z=16&output=embed`;
+/* Tên khách mời lấy từ link: ?to=Anh%20Nam  →  "Thân Mời Anh Nam" */
+const GUEST = (() => { try { return (new URLSearchParams(window.location.search).get('to') || '').replace(/\s+/g, ' ').trim().slice(0, 80); } catch { return ''; } })();
+
 /* Google Sheet nhận xác nhận & lời chúc: dán URL Web App (…/exec) của Apps Script vào đây. Để trống = chỉ lưu trên máy khách. */
 const SHEET_URL = 'https://script.google.com/macros/s/AKfycbwMM4F8Id4V2WVyhfDfIdAVRsIYMKtIfQ4muGiBmkuTyGQDScBA3G53JFeNX74q6sOYWA/exec';
 const sendToSheet = (type, data) => {
@@ -209,7 +212,7 @@ function Cover({ onOpen, phase }) {
               </div>
               <div className="cover__date" style={{ color: 'rgba(107, 123, 79, 0.7)', fontFamily: F.lora }}><D>{DATA.dateLabel}</D></div>
               <div className="cover__invite-wrap">
-                <p className="cover__invite" style={{ color: 'rgba(107, 123, 79, 0.7)', fontFamily: F.lora }}><D>Thân Mời</D></p>
+                <p className="cover__invite" style={{ color: 'rgba(107, 123, 79, 0.7)', fontFamily: F.lora }}><D>{GUEST ? 'Thân Mời:' : 'Thân Mời'}</D>{GUEST && <> <span className="cover__guest" style={{ color: INK }}>{GUEST}</span></>}</p>
               </div>
               <a href="#open" role="button" className="cover__btn" onClick={(e) => { e.preventDefault(); if (!opening) onOpen(); }}
                 style={{ backgroundColor: '#6b7b4f', color: '#fff', boxShadow: '0 4px 14px rgba(107, 123, 79, 0.35)', fontFamily: F.lora }}>
@@ -509,7 +512,7 @@ function Venue({ y }) {
 
 function Guestbook() {
   const [list, setList] = useState(() => load('wishes', []));
-  const [name, setName] = useState('');
+  const [name, setName] = useState(GUEST);
   const [msg, setMsg] = useState('');
   const [suggest, setSuggest] = useState(null);
   const fmt = (t) => { const d = new Date(t); const p = (x) => String(x).padStart(2, '0'); return `${p(d.getHours())}:${p(d.getMinutes())}:${p(d.getSeconds())} ${d.getDate()}/${d.getMonth() + 1}/${d.getFullYear()}`; };
@@ -582,7 +585,7 @@ function WishModal({ wishes, onPick, onClose }) {
 
 function Rsvp({ onClose }) {
   const [sent, setSent] = useState(false);
-  const [name, setName] = useState('');
+  const [name, setName] = useState(GUEST);
   const [attend, setAttend] = useState('');
   const ref = useRef(null);
   useEffect(() => { ref.current?.showModal(); }, []);

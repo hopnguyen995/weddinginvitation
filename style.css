@@ -55,7 +55,8 @@ a{color:inherit;text-decoration:inherit}
 .cover__divider span{font-size:14px;line-height:20px}
 .cover__date{font-size:18px;margin-bottom:20px;display:flex;flex-direction:column;align-items:center}
 .cover__invite-wrap{margin:0 auto 24px;max-width:300px}
-.cover__invite{font-size:18px;font-weight:300;margin-bottom:8px}
+.cover__invite{font-size:18px;font-weight:300;margin-bottom:8px;text-wrap:balance}
+.cover__guest{font-weight:500}
 .cover__btn{position:relative;padding:10px 32px;font-size:18px;line-height:28px;font-weight:600;border-radius:9999px;display:flex;width:fit-content;align-items:center;justify-content:center;margin:0 auto;overflow:hidden;cursor:pointer;-webkit-touch-callout:none;user-select:none}
 .cover__shine{position:absolute;top:0;height:100%;width:32px;pointer-events:none;background:linear-gradient(90deg,transparent,rgba(255,255,255,.4),transparent);animation:shine 3s ease-in-out infinite}
 @keyframes shine{0%{left:-100%}50%,100%{left:100%}}

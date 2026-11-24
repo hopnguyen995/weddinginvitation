@@ -227,13 +227,18 @@ function useAutoScroll(enabled) {
 }
 
 /* Co chữ cho vừa khung: tên cô dâu & chú rể dùng chung một cỡ (lấy cỡ nhỏ nhất cùng vừa) */
+const wide = () => (typeof window !== 'undefined' && window.innerWidth >= 768);
+const VENUE_MAX = () => (wide() ? 17 : 14);      // địa chỉ tiệc (khung xanh)
+const RITE_ADDR_MAX = () => (wide() ? 20 : 16);  // địa chỉ lễ (khung trắng)
+const LUNAR_MAX = () => (wide() ? 14 : 12);      // dòng ngày âm lịch
+const VEN_ADDR_MAX = () => (wide() ? 14 : 12);   // địa chỉ dưới 'Tiệc cưới sẽ tổ chức tại'
 function useFitGroup(max = 42, deps = [], min = 16) {
   const refs = useRef([]);
-  const [size, setSize] = useState(max);
+  const [size, setSize] = useState(() => (typeof max === 'function' ? max() : max));
   useLayoutEffect(() => {
     const els = refs.current.filter(Boolean); if (!els.length) return;
     const fit = () => {
-      let s = max;
+      let s = typeof max === 'function' ? max() : max;
       const apply = () => els.forEach((el) => { el.style.fontSize = s + 'px'; });
       apply();
       while (s > min && els.some((el) => el.scrollWidth > el.clientWidth)) { s -= 1; apply(); }
@@ -368,6 +373,9 @@ const ANNOUNCE = DATA.announce;
 function Ceremony() {
   const [nameSize, setNameRef] = useFitGroup(42, [COUPLE[0].full, COUPLE[1].full]);
   const [annSize, setAnnRef] = useFitGroup(17, ANNOUNCE, 10);
+  // Chia sẻ cỡ chữ câu mời cho các dòng địa chỉ ở khung khác
+  useEffect(() => { document.documentElement.style.setProperty('--ann-size', `${annSize}px`); }, [annSize]);
+  const [lunSize, setLunRef] = useFitGroup(LUNAR_MAX, [DATA.ceremony.lunar], 7);
   const [addrSize, setAddrRef] = useFitGroup(10, DATA.families.map((f) => f.address), 7);
   const [parentSize, setParentRef] = useFitGroup(14, DATA.families.flatMap((f) => [f.father, f.mother]), 10);
   const c = DATA.ceremony;
@@ -416,8 +424,8 @@ function Ceremony() {
               <span className="when__bar" style={{ fontFamily: F.bask, color: 'rgba(255, 255, 255, 0.5)' }}>|</span>
               <span className="when__side when__year-s" style={{ fontFamily: F.bask, textAlign: 'left' }}><D>{c.year}</D></span>
             </div>
-            <div className="lunar" style={{ color: W7, fontFamily: F.bask }}>{c.lunar}</div>
-            <div className="par__venue" style={{ color: W, fontFamily: F.bask }}><D>Tại {DATA.venueText || DATA.venue}</D></div>
+            <div ref={setLunRef(0)} className="lunar fit1" style={{ color: W7, fontFamily: F.bask, fontSize: lunSize }}>{c.lunar}</div>
+            <div className="par__venue" style={{ color: W, fontFamily: F.bask, fontSize: annSize }}><D>Tại {DATA.venueText || DATA.venue}</D></div>
           </div>
         </div>
       </div>
@@ -481,7 +489,7 @@ function Album() {
               const o = off(k), a = Math.abs(o), s = Math.sign(o);
               return (
                 <div key={src} className={`alb__item${a === 0 ? ' alb__item--on' : ''}`}
-                  style={{ aspectRatio: `${ratios[k].toFixed(6)} / 1`, transitionDuration: '1100ms', transform: `translateX(${o * 60}%) translateZ(${-150 * a}px) rotateY(${s * a * 45}deg) scale(${a === 0 ? 1 : a === 1 ? 0.85 : 0.7})`, opacity: a === 0 ? 1 : a === 1 ? 0.75 : a === 2 ? 0.5 : 0.3, zIndex: 100 - a }}
+                  style={{ aspectRatio: `${ratios[k].toFixed(6)} / 1`, ...(ratios[k] > 1 ? { width: '88%', height: 'auto' } : null), transitionDuration: '1100ms', transform: `translateX(${o * (ratios[k] > 1 ? 40 : 60)}%) translateZ(${-150 * a}px) rotateY(${s * a * 45}deg) scale(${a === 0 ? 1 : a === 1 ? 0.85 : 0.7})`, opacity: a === 0 ? 1 : a === 1 ? 0.75 : a === 2 ? 0.5 : 0.3, zIndex: 100 - a }}
                   onClick={() => (a === 0 ? setBox(k) : goTo(k))}>
                   <img alt={`Wedding photo ${k + 1}`} src={src} draggable="false" style={{ objectPosition: '50% 50%' }} />
                 </div>
@@ -547,6 +555,7 @@ function Calendar() {
 
 function Party({ y, onRsvp }) {
   const p = DATA.rite;
+  const [lunSize, setLunRef] = useFitGroup(LUNAR_MAX, [p.lunar], 7);
   return (
     <section className="par">
       <div className="par__box" style={{ borderColor: INK }}>
@@ -565,8 +574,8 @@ function Party({ y, onRsvp }) {
               <div className="par__rule" style={{ backgroundColor: INK }} />
               <span className="when__side when__year-s" style={{ color: INK, fontFamily: F.times, textAlign: 'left', textTransform: 'uppercase' }}><D>{p.year}</D></span>
             </div>
-            <div className="lunar" style={{ color: SAGE, fontFamily: F.bask }}>{p.lunar}</div>
-            {p.address && <div className="par__venue par__venue--rite" style={{ color: INK, fontFamily: F.bask }}><D>Tại {p.address}</D></div>}
+            <div ref={setLunRef(0)} className="lunar fit1" style={{ color: SAGE, fontFamily: F.bask, fontSize: lunSize }}>{p.lunar}</div>
+            {p.address && <div className="par__venue" style={{ color: INK, fontFamily: F.bask, fontSize: 'var(--ann-size, 16px)' }}><D>Tại {p.address}</D></div>}
             <div className="par__count">
               <h2 style={{ color: SAGE, fontFamily: F.bask }}><D>Cùng đếm&nbsp;ngược</D></h2>
               <div className="par__countval" style={{ color: SAGE, fontFamily: F.bask }}><Countdown /></div>
@@ -586,6 +595,7 @@ function Party({ y, onRsvp }) {
 }
 
 function Venue({ y }) {
+  const [vaSize, setVaRef] = useFitGroup(VEN_ADDR_MAX, [DATA.venue], 8);
   return (
     <div className="ven">
       <div aria-hidden="true" className="ven__flower" style={{ width: '1064.98px', height: '1094.98px', transform: `translate(-50%, ${y}px)` }}>
@@ -600,7 +610,7 @@ function Venue({ y }) {
       <section className="ven__body">
         <div className="ven__head">
           <h3 className="ven__title" style={{ color: INK, fontFamily: F.times, fontWeight: 700, letterSpacing: '0.04em' }}><D>Tiệc cưới sẽ tổ chức&nbsp;tại</D></h3>
-          <div className="ven__addr" style={{ backgroundColor: 'transparent', color: DARK, fontFamily: F.bask }}><D>{DATA.venue}</D></div>
+          <div ref={setVaRef(0)} className="ven__addr fit1" style={{ backgroundColor: 'transparent', color: DARK, fontFamily: F.bask, fontSize: vaSize }}><D>{DATA.venue}</D></div>
         </div>
         <div className="ven__map-wrap">
           <iframe title={`Bản đồ ${DATA.venue}`} className="ven__map" src={mapEmbed} loading="lazy" allowFullScreen referrerPolicy="no-referrer-when-downgrade" style={{ borderColor: INK }} />
@@ -770,8 +780,12 @@ function Music({ playing, onToggle }) {
   );
 }
 
+const FOOTER = ['Sự hiện diện của quý khách', 'là niềm vinh hạnh của gia đình chúng tôi!'];
+const FOOTER_MAX = () => (wide() ? 24 : 18);
+
 function App() {
   const [phase, setPhase] = useState('closed'); // closed → opening → leaving → open
+  const [ftrSize, setFtrRef] = useFitGroup(FOOTER_MAX, [...FOOTER, phase === 'open'], 11);
   const [playing, setPlaying] = useState(false);
   const [rsvp, setRsvp] = useState(false);
   const audio = useRef(null);
@@ -804,7 +818,9 @@ function App() {
                   <Venue y={y} />
                   <Guestbook />
                   <footer className="ftr">
-                    <span className="ftr__text" style={{ color: INK, fontFamily: F.times }}><D>Sự hiện diện của quý khách là niềm vinh hạnh của gia đình chúng tôi!</D></span>
+                    <span className="ftr__text" style={{ color: INK, fontFamily: F.times }}>
+                      {FOOTER.map((line, i) => <span key={i} ref={setFtrRef(i)} className="ftr__line" style={{ fontSize: ftrSize }}>{line}</span>)}
+                    </span>
                   </footer>
                 </div>
               </div>

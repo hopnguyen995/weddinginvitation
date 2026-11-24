@@ -4,11 +4,12 @@ import { copyFileSync, existsSync } from 'node:fs';
 import { defineConfig } from 'vite';
 
 // GitHub Pages: BASE_PATH=/weddinginvitation/ (đặt trong .github/workflows/deploy.yml)
-// Netlify/Vercel/Cloudflare: để trống → '/'
+// Vercel/Netlify/Cloudflare: để trống → '/'
 const ROOT = dirname(fileURLToPath(import.meta.url));
 const BASE = process.env.BASE_PATH || '/';
 // Địa chỉ đầy đủ của trang, dùng cho ảnh/link xem trước khi gửi qua Zalo, Messenger, Facebook
-const SITE_URL = process.env.SITE_URL || 'https://hopnguyen995.github.io/weddinginvitation/';
+// Mặc định: Vercel. GitHub Pages tự đặt SITE_URL riêng trong workflow.
+const SITE_URL = process.env.SITE_URL || 'https://maison-duonghao.vercel.app/';
 
 export default defineConfig({
   base: BASE,

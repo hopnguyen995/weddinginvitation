@@ -1,0 +1,8 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "rewrites": [
+    { "source": "/nha-trai/:name*", "destination": "/nha-trai/index.html" },
+    { "source": "/nha-gai/:name*", "destination": "/nha-gai/index.html" },
+    { "source": "/:name*", "destination": "/nha-trai/index.html" }
+  ]
+}

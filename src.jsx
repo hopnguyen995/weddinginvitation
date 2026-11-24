@@ -525,8 +525,15 @@ function Album() {
 function Countdown() {
   const calc = () => { const ms = new Date(DATA.party.start) - Date.now(); if (ms <= 0) return null; return [Math.floor(ms / 864e5), Math.floor(ms / 36e5) % 24, Math.floor(ms / 6e4) % 60, Math.floor(ms / 1e3) % 60]; };
   const [t, setT] = useState(calc);
-  useEffect(() => { const id = setInterval(() => setT(calc()), 1000); return () => clearInterval(id); }, []);
-  return <p>{t ? `${t[0]} ngày ${t[1]} giờ ${t[2]} phút ${t[3]} giây` : 'Hôm nay là ngày vui!'}</p>;
+  useEffect(() => { const id = setInterval(() => { const v = calc(); setT(v); if (!v) clearInterval(id); }, 1000); return () => clearInterval(id); }, []);
+  // Hết giờ (đã tới giờ tiệc): ẩn cả khối "Cùng đếm ngược"
+  if (!t) return null;
+  return (
+    <div className="par__count">
+      <h2 style={{ color: SAGE, fontFamily: F.bask }}><D>Cùng đếm&nbsp;ngược</D></h2>
+      <div className="par__countval" style={{ color: SAGE, fontFamily: F.bask }}><p>{`${t[0]} ngày ${t[1]} giờ ${t[2]} phút ${t[3]} giây`}</p></div>
+    </div>
+  );
 }
 function Calendar() {
   const first = (new Date(2026, 11, 1).getDay() + 6) % 7;
@@ -576,10 +583,7 @@ function Party({ y, onRsvp }) {
             </div>
             <div ref={setLunRef(0)} className="lunar fit1" style={{ color: SAGE, fontFamily: F.bask, fontSize: lunSize }}>{p.lunar}</div>
             {p.address && <div className="par__venue" style={{ color: INK, fontFamily: F.bask, fontSize: 'var(--ann-size, 16px)' }}><D>Tại {p.address}</D></div>}
-            <div className="par__count">
-              <h2 style={{ color: SAGE, fontFamily: F.bask }}><D>Cùng đếm&nbsp;ngược</D></h2>
-              <div className="par__countval" style={{ color: SAGE, fontFamily: F.bask }}><Countdown /></div>
-            </div>
+            <Countdown />
             <Calendar />
             <a href={calendarUrl()} target="_blank" rel="noopener noreferrer" className="par__cal-link" style={{ color: INK, fontFamily: F.times, background: 'none' }}><D>Thêm vào lịch</D></a>
           </div>

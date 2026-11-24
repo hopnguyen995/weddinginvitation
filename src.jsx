@@ -121,25 +121,25 @@ function useAutoScroll(enabled) {
   }, [enabled]);
 }
 
-/* Co chữ cho vừa khung (giống template tự fit tên cô dâu/chú rể) */
-function FitH3({ children, max = 42 }) {
-  const ref = useRef(null);
+/* Co chữ cho vừa khung: tên cô dâu & chú rể dùng chung một cỡ (lấy cỡ nhỏ nhất cùng vừa) */
+function useFitGroup(max = 42, deps = [], min = 16) {
+  const refs = useRef([]);
   const [size, setSize] = useState(max);
   useLayoutEffect(() => {
-    const el = ref.current; if (!el) return;
+    const els = refs.current.filter(Boolean); if (!els.length) return;
     const fit = () => {
-      let s = max; el.style.fontSize = s + 'px';
-      while (s > 16 && el.scrollWidth > el.clientWidth) { s -= 1; el.style.fontSize = s + 'px'; }
+      let s = max;
+      const apply = () => els.forEach((el) => { el.style.fontSize = s + 'px'; });
+      apply();
+      while (s > min && els.some((el) => el.scrollWidth > el.clientWidth)) { s -= 1; apply(); }
       setSize(s);
     };
     fit();
     document.fonts?.ready.then(fit);
-    const ro = new ResizeObserver(fit); ro.observe(el.parentElement);
+    const ro = new ResizeObserver(fit); ro.observe(els[0].parentElement);
     return () => ro.disconnect();
-  }, [children, max]);
-  return (
-    <h3 ref={ref} className="couple-name" style={{ fontSize: size, fontFamily: F.viaoda, color: '#fff' }}>{children}</h3>
-  );
+  }, [max, min, ...deps]);
+  return [size, (i) => (el) => { refs.current[i] = el; }];
 }
 
 /* ================= Bìa thiệp ================= */
@@ -257,7 +257,11 @@ function Header({ y }) {
   );
 }
 
+const ANNOUNCE = ['TRÂN TRỌNG KÍNH MỜI TỚI DỰ', 'LỄ THÀNH HÔN CỦA CÁC CON CHÚNG TÔI'];
+
 function Ceremony() {
+  const [nameSize, setNameRef] = useFitGroup(42, [DATA.groom, DATA.bride]);
+  const [annSize, setAnnRef] = useFitGroup(22, ANNOUNCE, 10);
   const c = DATA.ceremony;
   const W = '#fff', W7 = 'rgba(255, 255, 255, 0.7)';
   return (
@@ -280,12 +284,16 @@ function Ceremony() {
               </React.Fragment>
             ))}
           </div>
-          <div className="cer__announce" style={{ whiteSpace: 'pre-line', fontFamily: F.bask, color: W }}><D>{'TRÂN TRỌNG KÍNH MỜI\nDỰ LỄ THÀNH HÔN CỦA CÁC CON'}</D></div>
+          <div className="cer__announce" style={{ fontFamily: F.bask, color: W }}>
+            {ANNOUNCE.map((line, i) => (
+              <div key={i} ref={setAnnRef(i)} className="cer__announce-line" style={{ fontSize: annSize }}>{line}</div>
+            ))}
+          </div>
           <div className="couple">
-            <FitH3>{DATA.groom}</FitH3>
+            <h3 ref={setNameRef(0)} className="couple-name" style={{ fontSize: nameSize, fontFamily: F.viaoda, color: '#fff' }}>{DATA.groom}</h3>
             <div className="couple__label" style={{ color: W7, fontFamily: F.bask, letterSpacing: '0.1em' }}><D>{''}</D></div>
             <div className="couple__amp" style={{ color: W, fontFamily: F.times }}>&amp;</div>
-            <FitH3>{DATA.bride}</FitH3>
+            <h3 ref={setNameRef(1)} className="couple-name" style={{ fontSize: nameSize, fontFamily: F.viaoda, color: '#fff' }}>{DATA.bride}</h3>
             <div className="couple__label" style={{ color: W7, fontFamily: F.bask, letterSpacing: '0.1em' }}><D>{''}</D></div>
           </div>
           <div className="when" style={{ fontFamily: F.bask }}>

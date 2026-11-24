@@ -8,7 +8,7 @@ const DATA = {
   brideShort: 'Trần Hảo',
   groom: 'Trần Hải Dương',
   bride: 'Trần Thị Quang Hảo',
-  dateLabel: '11 tháng 12, 2026',
+  dateLabel: '12 tháng 12, 2026',
   families: [
     { title: 'Ông Bà', father: 'Trần Đình Đông', mother: 'Trần Thị Thúy Hằng', address: 'Thôn Đông Thành- Hát Môn- Hà Nội' },
     { title: 'Ông Bà', father: 'Trần Quang Tài', mother: 'Nguyễn Thị Ngọc Hạnh', address: 'Thôn Tiền Giang- Hát Môn- Hà Nội' },
@@ -280,7 +280,7 @@ function Ceremony() {
               </React.Fragment>
             ))}
           </div>
-          <div className="cer__announce" style={{ whiteSpace: 'pre-line', fontFamily: F.bask, color: W }}><D>{'TRÂN TRỌNG BÁO TIN\nLỄ THÀNH HÔN CỦA CON CHÚNG TÔI'}</D></div>
+          <div className="cer__announce" style={{ whiteSpace: 'pre-line', fontFamily: F.bask, color: W }}><D>{'TRÂN TRỌNG KÍNH MỜI\nDỰ LỄ THÀNH HÔN CỦA CÁC CON'}</D></div>
           <div className="couple">
             <FitH3>{DATA.groom}</FitH3>
             <div className="couple__label" style={{ color: W7, fontFamily: F.bask, letterSpacing: '0.1em' }}><D>{''}</D></div>

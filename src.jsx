@@ -104,7 +104,7 @@ const GUEST = (() => { try { return (new URLSearchParams(window.location.search)
 const SHEET_URL = 'https://script.google.com/macros/s/AKfycbwMM4F8Id4V2WVyhfDfIdAVRsIYMKtIfQ4muGiBmkuTyGQDScBA3G53JFeNX74q6sOYWA/exec';
 const sendToSheet = (type, data) => {
   if (!SHEET_URL) return Promise.resolve();
-  return fetch(SHEET_URL, { method: 'POST', mode: 'no-cors', body: new URLSearchParams({ type, ...data }) });
+  return fetch(SHEET_URL, { method: 'POST', mode: 'no-cors', body: new URLSearchParams({ type, side: SIDE, ...data }) });
 };
 const load = (k, d) => { try { return JSON.parse(localStorage.getItem(k)) ?? d; } catch { return d; } };
 const save = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} };

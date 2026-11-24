@@ -55,6 +55,12 @@ const calendarUrl = () => {
 const VENUE_GEO = '21.128544,105.617632'; // https://maps.app.goo.gl/qjKgnASKjhUFGdQy8 (Phủ Quận Công Nguyễn Ngọc Trì)
 const mapsUrl = `https://www.google.com/maps/dir/?api=1&destination=${VENUE_GEO}`;
 const mapEmbed = `https://maps.google.com/maps?q=${VENUE_GEO}&z=16&output=embed`;
+/* Google Sheet nhận xác nhận & lời chúc: dán URL Web App (…/exec) của Apps Script vào đây. Để trống = chỉ lưu trên máy khách. */
+const SHEET_URL = 'https://script.google.com/macros/s/AKfycbwMM4F8Id4V2WVyhfDfIdAVRsIYMKtIfQ4muGiBmkuTyGQDScBA3G53JFeNX74q6sOYWA/exec';
+const sendToSheet = (type, data) => {
+  if (!SHEET_URL) return Promise.resolve();
+  return fetch(SHEET_URL, { method: 'POST', mode: 'no-cors', body: new URLSearchParams({ type, ...data }) });
+};
 const load = (k, d) => { try { return JSON.parse(localStorage.getItem(k)) ?? d; } catch { return d; } };
 const save = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} };
 const INK = 'rgb(107, 123, 79)', SAGE = 'rgb(135, 161, 114)', DARK = 'rgb(39, 46, 19)';
@@ -512,6 +518,7 @@ function Guestbook() {
     if (!name.trim() || !msg.trim()) return;
     const next = [{ name: name.trim(), msg: msg.trim(), at: Date.now() }, ...list];
     setList(next); save('wishes', next); setName(''); setMsg('');
+    sendToSheet('wish', { name: next[0].name, msg: next[0].msg }).catch(() => {});
   };
   const inp = { borderColor: INK, color: INK, backgroundColor: 'transparent' };
   return (
@@ -580,7 +587,19 @@ function Rsvp({ onClose }) {
   const ref = useRef(null);
   useEffect(() => { ref.current?.showModal(); }, []);
   const ok = name.trim() && attend;
-  const submit = (e) => { e.preventDefault(); if (!ok) return; save('rsvp', [...load('rsvp', []), { name: name.trim(), attend, at: Date.now() }]); setSent(true); };
+  const [busy, setBusy] = useState(false);
+  const [err, setErr] = useState('');
+  const submit = async (e) => {
+    e.preventDefault(); if (!ok || busy) return;
+    setBusy(true); setErr('');
+    try {
+      await sendToSheet('rsvp', { name: name.trim(), attend });
+      save('rsvp', [...load('rsvp', []), { name: name.trim(), attend, at: Date.now() }]);
+      setSent(true);
+    } catch {
+      setErr('Không gửi được, vui lòng kiểm tra mạng và thử lại.');
+    } finally { setBusy(false); }
+  };
   const close = () => ref.current?.close();
   const Opt = ({ value, label, icon }) => (
     <label className={`rsvp__opt${attend === value ? ' is-on' : ''}`}>
@@ -613,7 +632,8 @@ function Rsvp({ onClose }) {
               <Opt value="yes" label="Tôi sẽ đến" icon={<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M5 13l4 4L19 7" /></svg>} />
               <Opt value="no" label="Rất tiếc, tôi không thể đến" icon={<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round"><path d="M18 6 6 18M6 6l12 12" /></svg>} />
             </div>
-            <button type="submit" className="rsvp__submit" disabled={!ok}><span>Gửi xác nhận</span></button>
+            {err && <p className="rsvp__err" role="alert">{err}</p>}
+            <button type="submit" className="rsvp__submit" disabled={!ok || busy}><span>{busy ? 'Đang gửi…' : 'Gửi xác nhận'}</span></button>
           </form>
         )}
       </div>

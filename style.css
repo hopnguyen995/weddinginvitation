@@ -362,3 +362,5 @@ a{color:inherit;text-decoration:inherit}
   .cover__leaf,.cover__shine,.cover__particle,.cover__ring{animation:none!important;display:none}
   .hdr__photo{animation:none!important}
 }
+
+.rsvp__err{margin:12px 0 0;color:#b42318;font-size:13px;text-align:center}

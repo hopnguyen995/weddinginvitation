@@ -92,7 +92,7 @@ const DATA = {
 try { document.title = `${COUPLE[0].short} & ${COUPLE[1].short}`; } catch {}
 const BASE = import.meta.env.BASE_URL; // '/' khi dev, '/weddinginvitation/' trên GitHub Pages
 const T = `${BASE}images/themes/minimalism-green/`;
-const PHOTOS = Array.from({ length: 11 }, (_, i) => `${BASE}images/photos/album-${String(i + 1).padStart(2, '0')}.jpg`);
+const PHOTOS = Array.from({ length: 19 }, (_, i) => `${BASE}images/photos/album-${String(i + 1).padStart(2, '0')}.jpg`);
 const G = 'Hải Dương', B = 'Trần Hảo';
 const WISHES = [
   `Chúc ${G} và ${B} trăm năm hạnh phúc, đầu bạc răng long!`,

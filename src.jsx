@@ -10,8 +10,8 @@ const DATA = {
   bride: 'Trần Thị Quang Hảo',
   dateLabel: '12 tháng 12, 2026',
   families: [
-    { title: 'Ông Bà', father: 'Trần Đình Đông', mother: 'Trần Thị Thúy Hằng', address: 'Thôn Đông Thành- Hát Môn- Hà Nội' },
-    { title: 'Ông Bà', father: 'Trần Quang Tài', mother: 'Nguyễn Thị Ngọc Hạnh', address: 'Thôn Tiền Giang- Hát Môn- Hà Nội' },
+    { title: 'Ông Bà', father: 'Trần Đình Đông', mother: 'Trần Thị Thúy Hằng', address: 'Đông Thành- Hát Môn- Hà Nội' },
+    { title: 'Ông Bà', father: 'Trần Quang Tài', mother: 'Nguyễn Thị Ngọc Hạnh', address: 'Tiền Giang- Hát Môn- Hà Nội' },
   ],
   ceremony: { place: 'LỄ THÀNH HÔN ĐƯỢC CỬ HÀNH TẠI\nTƯ GIA NHÀ TRAI', time: '10:30', weekday: 'THỨ BẢY', day: '12', month: 'THÁNG 12', year: '2026', lunar: '(Tức ngày 4 tháng 11 năm Bính Ngọ)' },
   party: { time: '15:00', weekday: 'THỨ SÁU', day: '11', month: 'THÁNG 12', year: '2026', lunar: '(Tức ngày 3 tháng 11 năm Bính Ngọ)', start: '2026-12-11T15:00:00+07:00' },
@@ -52,7 +52,7 @@ const calendarUrl = () => {
   });
   return `https://www.google.com/calendar/render?${p.toString().replace(/\+/g, '%20')}`;
 };
-const VENUE_GEO = '21.128502,105.617245'; // https://maps.app.goo.gl/qdQY6DH9vLZpDTeH8
+const VENUE_GEO = '21.128544,105.617632'; // https://maps.app.goo.gl/qjKgnASKjhUFGdQy8 (Phủ Quận Công Nguyễn Ngọc Trì)
 const mapsUrl = `https://www.google.com/maps/dir/?api=1&destination=${VENUE_GEO}`;
 const mapEmbed = `https://maps.google.com/maps?q=${VENUE_GEO}&z=16&output=embed`;
 const load = (k, d) => { try { return JSON.parse(localStorage.getItem(k)) ?? d; } catch { return d; } };
@@ -137,7 +137,8 @@ function useFitGroup(max = 42, deps = [], min = 16) {
     fit();
     document.fonts?.ready.then(fit);
     const ro = new ResizeObserver(fit); ro.observe(els[0].parentElement);
-    return () => ro.disconnect();
+    window.addEventListener('resize', fit);
+    return () => { ro.disconnect(); window.removeEventListener('resize', fit); };
   }, [max, min, ...deps]);
   return [size, (i) => (el) => { refs.current[i] = el; }];
 }
@@ -262,6 +263,8 @@ const ANNOUNCE = ['TRÂN TRỌNG KÍNH MỜI TỚI DỰ', 'LỄ THÀNH HÔN CỦ
 function Ceremony() {
   const [nameSize, setNameRef] = useFitGroup(42, [DATA.groom, DATA.bride]);
   const [annSize, setAnnRef] = useFitGroup(22, ANNOUNCE, 10);
+  const [addrSize, setAddrRef] = useFitGroup(10, DATA.families.map((f) => f.address), 7);
+  const [parentSize, setParentRef] = useFitGroup(14, DATA.families.flatMap((f) => [f.father, f.mother]), 10);
   const c = DATA.ceremony;
   const W = '#fff', W7 = 'rgba(255, 255, 255, 0.7)';
   return (
@@ -277,9 +280,9 @@ function Ceremony() {
                 {i === 1 && <div className="fam__rule" style={{ backgroundColor: 'rgba(255, 255, 255, 0.4)' }} />}
                 <div className="fam__col">
                   <span className="t12" style={{ color: W7 }}><D>{f.title}</D></span>
-                  <span className="t12 fam__name" style={{ color: W, fontSize: 14 }}><D>{f.father}</D></span>
-                  <span className="t12 fam__name" style={{ color: W, fontSize: 14 }}><D>{f.mother}</D></span>
-                  <div className="fam__addr" style={{ color: W7 }}><D>{f.address}</D></div>
+                  <span ref={setParentRef(i * 2)} className="t12 fam__name" style={{ color: W, fontSize: parentSize }}><D>{f.father}</D></span>
+                  <span ref={setParentRef(i * 2 + 1)} className="t12 fam__name" style={{ color: W, fontSize: parentSize }}><D>{f.mother}</D></span>
+                  <div ref={setAddrRef(i)} className="fam__addr" style={{ color: W7, fontSize: addrSize }}><D>{f.address}</D></div>
                 </div>
               </React.Fragment>
             ))}
@@ -415,7 +418,7 @@ function Calendar() {
         <div className="cal__grid">
           {cells.map((d, k) => (
             <div key={k} className="cal__cell">
-              {d && (d === Number(DATA.party.day) ? (
+              {d && ([Number(DATA.party.day), Number(DATA.ceremony.day)].includes(d) ? (
                 <div className="cal__mark">
                   <svg viewBox="0 0 24 22" fill="#ffffff"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" transform="translate(0 -1)" /></svg>
                   <span style={{ color: 'rgb(51, 51, 51)' }}>{d}</span>

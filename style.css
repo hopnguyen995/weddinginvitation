@@ -117,6 +117,9 @@ a{color:inherit;text-decoration:inherit}
 .cer__fill,.cer__paper{position:absolute;inset:0;border-radius:200px 200px 10px 10px}
 .cer__body{position:relative;z-index:10;display:flex;flex-direction:column;align-items:center;gap:24px}
 .cer__title{max-width:240px;margin:0 auto}
+.cer__title .t20{font-size:16px}
+.par__title .t20{font-size:24px}
+@media (min-width:768px){.par__title .t20{font-size:28px}}
 .fam{position:relative;display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);grid-template-rows:repeat(4,auto);justify-content:center;column-gap:14px;row-gap:3px;text-align:center}
 .fam__col{grid-row:span 4/span 4;display:grid;min-width:0;grid-template-rows:subgrid;justify-items:center}
 .fam__name{font-weight:600;display:block;align-self:stretch;width:100%;min-width:0;white-space:nowrap;overflow:hidden}
@@ -175,7 +178,7 @@ a{color:inherit;text-decoration:inherit}
 .par__info{display:flex;flex-direction:column;align-items:center;gap:16px;text-align:center}
 .par__lead{font-weight:400;font-size:16px;display:flex;flex-direction:column;align-items:center}
 .par__rule{height:24px;width:2px}
-.par__venue{font-size:16px;line-height:1.4;text-transform:uppercase;text-wrap:balance}
+.par__venue{font-size:14px;line-height:1.4;text-transform:uppercase;text-wrap:balance}
 .par__count{display:flex;align-items:center;justify-content:center;flex-direction:column;margin-top:16px}
 .par__countval{text-align:center;margin-top:8px;font-size:14px;line-height:20px}
 .calwrap{margin:12px auto 0;width:fit-content;max-width:100%;overflow:hidden;border-radius:10px;padding:4px 12px 12px}
@@ -342,7 +345,7 @@ a{color:inherit;text-decoration:inherit}
   .alb__stage{height:520px}
   .alb__nav{display:flex}
   .par__lead{font-size:20px}
-  .par__venue{font-size:20px}
+  .par__venue{font-size:17px}
   .par__countval{font-size:18px;line-height:28px}
   .cal{width:352px}
   .cal__head div{font-size:11px}

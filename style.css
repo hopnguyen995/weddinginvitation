@@ -175,6 +175,7 @@ a{color:inherit;text-decoration:inherit}
 .par__info{display:flex;flex-direction:column;align-items:center;gap:16px;text-align:center}
 .par__lead{font-weight:400;font-size:16px;display:flex;flex-direction:column;align-items:center}
 .par__rule{height:24px;width:2px}
+.par__venue{font-size:16px;line-height:1.4;text-transform:uppercase;text-wrap:balance}
 .par__count{display:flex;align-items:center;justify-content:center;flex-direction:column;margin-top:16px}
 .par__countval{text-align:center;margin-top:8px;font-size:14px;line-height:20px}
 .calwrap{margin:12px auto 0;width:fit-content;max-width:100%;overflow:hidden;border-radius:10px;padding:4px 12px 12px}
@@ -341,6 +342,7 @@ a{color:inherit;text-decoration:inherit}
   .alb__stage{height:520px}
   .alb__nav{display:flex}
   .par__lead{font-size:20px}
+  .par__venue{font-size:20px}
   .par__countval{font-size:18px;line-height:28px}
   .cal{width:352px}
   .cal__head div{font-size:11px}
@@ -369,3 +371,9 @@ a{color:inherit;text-decoration:inherit}
 /* Khóa cuộn trang khi mở ảnh phóng to */
 html.modal-open, html.modal-open body{overflow:hidden;overscroll-behavior:none}
 .lb{overscroll-behavior:contain;touch-action:pan-x pinch-zoom}
+
+/* Số kiểu lining (cao bằng chữ in hoa) cho giờ, ngày, tháng, năm — để 'THÁNG 12', '2026', '16:00' cùng chiều cao */
+.when,.par__info,.lunar{font-variant-numeric:lining-nums;font-feature-settings:'lnum' 1}
+/* Số năm trông nhỏ hơn chữ in hoa có dấu ('THÁNG 12') nên phóng nhẹ để nhìn bằng nhau */
+.when__side.when__year-s{font-size:14px}
+@media (min-width:768px){.when__side.when__year-s{font-size:18px}}

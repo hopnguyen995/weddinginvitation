@@ -55,18 +55,24 @@ const FAMILIES = {
 const SIDES = {
   groom: {
     dateLabel: '12 tháng 12, 2026',
-    ceremony: { place: 'LỄ THÀNH HÔN ĐƯỢC CỬ HÀNH TẠI\nTƯ GIA NHÀ TRAI', time: '10:30', weekday: 'THỨ BẢY', day: '12', month: 'THÁNG 12', year: '2026', lunar: '(Tức ngày 4 tháng 11 năm Bính\u00a0Ngọ)' },
+    ceremony: { place: 'TIỆC CƯỚI SẼ DIỄN RA', time: '15:00', weekday: 'THỨ SÁU', day: '11', month: 'THÁNG 12', year: '2026', lunar: '(Tức ngày 3 tháng 11 năm Bính\u00a0Ngọ)' },
     party: { time: '15:00', weekday: 'THỨ SÁU', day: '11', month: 'THÁNG 12', year: '2026', lunar: '(Tức ngày 3 tháng 11 năm Bính\u00a0Ngọ)', start: '2026-12-11T15:00:00+07:00' },
-    announce: ['TRÂN TRỌNG KÍNH MỜI TỚI DỰ', 'LỄ THÀNH HÔN CỦA CÁC CON CHÚNG TÔI'],
-    venue: 'Sân Phủ Quận Công',
+    // Khung trắng phía dưới album: thông tin lễ
+    rite: { title: 'THÔNG TIN LỄ\u00a0THÀNH\u00a0HÔN', lead: 'Lễ thành hôn được cử hành tại tư gia nhà trai vào lúc:', time: '10:30', weekday: 'THỨ BẢY', day: '12', month: 'THÁNG 12', year: '2026', lunar: '(Tức ngày 4 tháng 11 năm Bính\u00a0Ngọ)' },
+    announce: ['TRÂN TRỌNG KÍNH MỜI TỚI DỰ BỮA TIỆC', 'THÂN MẬT CÙNG GIA ĐÌNH CHÚNG TÔI'],
+    venue: 'Sân Phủ Quận Công, Đông Thành, Xã Hát Môn, Hà Nội',
+    venueText: 'Sân\u00a0Phủ\u00a0Quận\u00a0Công, Đông\u00a0Thành, Xã\u00a0Hát\u00a0Môn, Hà\u00a0Nội',
     geo: '21.128544,105.617632', // https://maps.app.goo.gl/qjKgnASKjhUFGdQy8 (Phủ Quận Công Nguyễn Ngọc Trì)
   },
   bride: {
     dateLabel: '12 tháng 12, 2026',
-    ceremony: { place: 'LỄ VU QUY ĐƯỢC CỬ HÀNH TẠI\nTƯ GIA NHÀ GÁI', time: '09:00', weekday: 'THỨ BẢY', day: '12', month: 'THÁNG 12', year: '2026', lunar: '(Tức ngày 4 tháng 11 năm Bính\u00a0Ngọ)' },
+    ceremony: { place: 'TIỆC CƯỚI SẼ DIỄN RA', time: '16:00', weekday: 'THỨ SÁU', day: '11', month: 'THÁNG 12', year: '2026', lunar: '(Tức ngày 3 tháng 11 năm Bính\u00a0Ngọ)' },
     party: { time: '16:00', weekday: 'THỨ SÁU', day: '11', month: 'THÁNG 12', year: '2026', lunar: '(Tức ngày 3 tháng 11 năm Bính\u00a0Ngọ)', start: '2026-12-11T16:00:00+07:00' },
-    announce: ['TRÂN TRỌNG KÍNH MỜI TỚI DỰ', 'LỄ VU QUY CỦA CÁC CON CHÚNG TÔI'],
-    venue: 'Trung Tâm Văn Hoá - Thể Thao Xã Hát Môn',
+    rite: { title: 'THÔNG TIN LỄ\u00a0VU\u00a0QUY', lead: 'Lễ vu quy được cử hành tại tư gia nhà gái vào lúc:', time: '09:00', weekday: 'THỨ BẢY', day: '12', month: 'THÁNG 12', year: '2026', lunar: '(Tức ngày 4 tháng 11 năm Bính\u00a0Ngọ)' },
+    announce: ['TRÂN TRỌNG KÍNH MỜI TỚI DỰ BỮA TIỆC', 'THÂN MẬT CÙNG GIA ĐÌNH CHÚNG TÔI'],
+    venue: 'Trung Tâm Văn Hoá - Thể Thao, Xã Hát Môn, Hà Nội',
+    // Cách xuống dòng khi hiển thị: \u00a0 = dấu cách không ngắt dòng, \u2011 = gạch nối không ngắt
+    venueText: 'Trung\u00a0Tâm Văn\u00a0Hoá\u00a0\u2011\u00a0Thể\u00a0Thao, Xã\u00a0Hát\u00a0Môn, Hà\u00a0Nội',
     geo: '21.1280849,105.6159094', // https://maps.app.goo.gl/JbsvQxawdd8RDDKT6
   },
 };
@@ -400,19 +406,18 @@ function Ceremony() {
           </div>
           <div className="when" style={{ fontFamily: F.bask }}>
             <div className="when__intro" style={{ color: W7 }}>
-              <span dir="auto" className="when__place">{c.place}</span>
-              <p className="when__at" style={{ color: W7 }}>VÀO LÚC</p>
+              <span dir="auto" className="when__place">{c.place} VÀO&nbsp;LÚC</span>
             </div>
-            <div className="when__time" style={{ color: W, fontFamily: F.bask }}>{c.time}</div>
+            <div className="when__time" style={{ color: W, fontFamily: F.bask }}>{c.time}, <D>{c.weekday}</D></div>
             <div className="when__row" style={{ color: W }}>
-              <span className="when__side" style={{ fontFamily: F.bask, textAlign: 'right' }}><D>{c.weekday}</D></span>
+              <span className="when__side" style={{ fontFamily: F.bask, textAlign: 'right' }}><D>{c.month}</D></span>
               <span className="when__bar" style={{ fontFamily: F.bask, color: 'rgba(255, 255, 255, 0.5)' }}>|</span>
               <span className="when__day" style={{ fontFamily: F.bask }}>{c.day}</span>
               <span className="when__bar" style={{ fontFamily: F.bask, color: 'rgba(255, 255, 255, 0.5)' }}>|</span>
-              <span className="when__side" style={{ fontFamily: F.bask, textAlign: 'left' }}><D>{c.month}</D></span>
+              <span className="when__side when__year-s" style={{ fontFamily: F.bask, textAlign: 'left' }}><D>{c.year}</D></span>
             </div>
-            <div className="when__year" style={{ color: W, fontFamily: F.bask }}>{c.year}</div>
             <div className="lunar" style={{ color: W7, fontFamily: F.bask }}>{c.lunar}</div>
+            <div className="par__venue" style={{ color: W, fontFamily: F.bask }}><D>Tại {DATA.venueText || DATA.venue}</D></div>
           </div>
         </div>
       </div>
@@ -526,7 +531,7 @@ function Calendar() {
         <div className="cal__grid">
           {cells.map((d, k) => (
             <div key={k} className="cal__cell">
-              {d && ([Number(DATA.party.day), Number(DATA.ceremony.day)].includes(d) ? (
+              {d && ([Number(DATA.party.day), Number(DATA.ceremony.day), Number(DATA.rite.day)].includes(d) ? (
                 <div className="cal__mark">
                   <svg viewBox="0 0 24 22" fill="#ffffff"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" transform="translate(0 -1)" /></svg>
                   <span style={{ color: 'rgb(51, 51, 51)' }}>{d}</span>
@@ -541,7 +546,7 @@ function Calendar() {
 }
 
 function Party({ y, onRsvp }) {
-  const p = DATA.party;
+  const p = DATA.rite;
   return (
     <section className="par">
       <div className="par__box" style={{ borderColor: INK }}>
@@ -549,9 +554,9 @@ function Party({ y, onRsvp }) {
         <div aria-hidden="true" className="paper par__paper" style={{ backgroundImage: `url("${T}paper.webp")`, backgroundSize: '666.5px 1000px' }} />
         <FlowerParallax y={y} left="-351.49px" top="-239.99px" width="1064.98px" height="1094.98px" />
         <div className="par__body">
-          <h2 className="h2" style={{ color: INK, fontFamily: F.times }}><span className="t20"><D>THÔNG TIN TIỆC&nbsp;CƯỚI</D></span></h2>
+          <h2 className="h2" style={{ color: INK, fontFamily: F.times }}><span className="t20"><D>{p.title}</D></span></h2>
           <div className="par__info" style={{ fontFamily: F.bask, color: INK }}>
-            <h3 className="par__lead" style={{ color: INK, fontFamily: F.bask, textTransform: 'uppercase' }}><D>Tiệc cưới sẽ diễn ra vào&nbsp;lúc:</D></h3>
+            <h3 className="par__lead" style={{ color: INK, fontFamily: F.bask, textTransform: 'uppercase', textWrap: 'balance' }}><D>{p.lead}</D></h3>
             <div className="when__time when__time--d" style={{ color: SAGE, fontFamily: F.bask }}>{p.time}</div>
             <div className="when__row" style={{ color: INK, fontFamily: F.times }}>
               <span className="when__side" style={{ color: INK, fontFamily: F.times, textAlign: 'right', textTransform: 'uppercase' }}><D>{p.weekday}</D></span>

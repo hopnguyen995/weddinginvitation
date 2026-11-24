@@ -5,12 +5,24 @@ import './style.css';
 /* ================= Nội dung thiệp (giữ nguyên text của bạn) =================
  * Hai phiên bản thiệp, chọn bằng tham số trên link:
  *   ?side=groom (mặc định) → thiệp nhà trai
- *   ?side=bride            → thiệp nhà gái
+ *   ?side=bride hoặc /nha-gai/ → thiệp nhà gái (nên dùng /nha-gai/ để ảnh xem trước đúng)
  * Kết hợp với tên khách: ?side=bride&to=Anh+Nam
  */
+/* Đọc tham số trên link, chấp nhận cả cách viết sai thường gặp:
+ *   ?side=bride?to=Anh+Nam  (dùng ? thay cho &)   ·   ?site=bride  (gõ nhầm side) */
+const QUERY = (() => {
+  try {
+    const raw = window.location.search.replace(/^\?/, '').replace(/\?/g, '&');
+    const q = new URLSearchParams(raw);
+    if (!q.has('side') && q.has('site')) q.set('side', q.get('site'));
+    return q;
+  } catch { return new URLSearchParams(); }
+})();
+
 const SIDE = (() => {
   try {
-    const q = new URLSearchParams(window.location.search);
+    if (window.__SIDE__ === 'bride') return 'bride'; // trang /nha-gai/
+    const q = QUERY;
     return (q.get('side') || '').toLowerCase() === 'bride' || q.has('bride') ? 'bride' : 'groom';
   } catch { return 'groom'; }
 })();
@@ -56,6 +68,7 @@ const DATA = {
   families: [FAMILIES[SIDE], FAMILIES[OTHER]],
   music: `${import.meta.env.BASE_URL}music/song.mp3`, // file nhạc: public/music/song.mp3
 };
+try { document.title = `${COUPLE[0].short} & ${COUPLE[1].short}`; } catch {}
 const BASE = import.meta.env.BASE_URL; // '/' khi dev, '/weddinginvitation/' trên GitHub Pages
 const T = `${BASE}images/themes/minimalism-green/`;
 const PHOTOS = Array.from({ length: 11 }, (_, i) => `${BASE}images/photos/album-${String(i + 1).padStart(2, '0')}.jpg`);
@@ -98,7 +111,7 @@ const VENUE_GEO = DATA.geo;
 const mapsUrl = `https://www.google.com/maps/dir/?api=1&destination=${VENUE_GEO}`;
 const mapEmbed = `https://maps.google.com/maps?q=${VENUE_GEO}&z=16&output=embed`;
 /* Tên khách mời lấy từ link: ?to=Anh%20Nam  →  "Thân Mời Anh Nam" */
-const GUEST = (() => { try { return (new URLSearchParams(window.location.search).get('to') || '').replace(/\s+/g, ' ').trim().slice(0, 80); } catch { return ''; } })();
+const GUEST = (() => { try { return (QUERY.get('to') || '').replace(/\s+/g, ' ').trim().slice(0, 80); } catch { return ''; } })();
 
 /* Google Sheet nhận xác nhận & lời chúc: dán URL Web App (…/exec) của Apps Script vào đây. Để trống = chỉ lưu trên máy khách. */
 const SHEET_URL = 'https://script.google.com/macros/s/AKfycbwMM4F8Id4V2WVyhfDfIdAVRsIYMKtIfQ4muGiBmkuTyGQDScBA3G53JFeNX74q6sOYWA/exec';

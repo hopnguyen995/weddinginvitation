@@ -1,8 +1,26 @@
+import { dirname, resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { defineConfig } from 'vite';
 
-// GitHub Pages phục vụ trang tại https://hopnguyen995.github.io/weddinginvitation/
-export default defineConfig(({ command }) => ({
-  // Root deploy works on Netlify, Vercel, Cloudflare Pages, or any static host.
-  // Set BASE_PATH=/weddinginvitation/ only when building for GitHub Pages.
-  base: process.env.BASE_PATH || '/',
-}));
+// GitHub Pages: BASE_PATH=/weddinginvitation/ (đặt trong .github/workflows/deploy.yml)
+// Netlify/Vercel/Cloudflare: để trống → '/'
+const ROOT = dirname(fileURLToPath(import.meta.url));
+const BASE = process.env.BASE_PATH || '/';
+// Địa chỉ đầy đủ của trang, dùng cho ảnh/link xem trước khi gửi qua Zalo, Messenger, Facebook
+const SITE_URL = process.env.SITE_URL || 'https://hopnguyen995.github.io/weddinginvitation/';
+
+export default defineConfig({
+  base: BASE,
+  plugins: [{
+    name: 'site-url',
+    transformIndexHtml: (html) => html.replaceAll('__SITE_URL__', SITE_URL.endsWith('/') ? SITE_URL : `${SITE_URL}/`),
+  }],
+  build: {
+    rollupOptions: {
+      input: {
+        main: resolve(ROOT, 'index.html'),       // thiệp nhà trai
+        bride: resolve(ROOT, 'nha-gai/index.html'), // thiệp nhà gái
+      },
+    },
+  },
+});

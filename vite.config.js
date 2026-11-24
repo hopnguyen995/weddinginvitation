@@ -1,5 +1,6 @@
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { copyFileSync, existsSync } from 'node:fs';
 import { defineConfig } from 'vite';
 
 // GitHub Pages: BASE_PATH=/weddinginvitation/ (đặt trong .github/workflows/deploy.yml)
@@ -14,6 +15,15 @@ export default defineConfig({
   plugins: [{
     name: 'site-url',
     transformIndexHtml: (html) => html.replaceAll('__SITE_URL__', SITE_URL.endsWith('/') ? SITE_URL : `${SITE_URL}/`),
+  }, {
+    // GitHub Pages: link dạng /weddinginvitation/anh-nam không có file → GitHub trả 404.html.
+    // Cho 404.html chính là thiệp để tên khách vẫn hiện (thiệp tự đọc tên từ đường dẫn).
+    name: 'spa-404',
+    apply: 'build',
+    closeBundle() {
+      const out = resolve(ROOT, 'dist');
+      if (existsSync(resolve(out, 'index.html'))) copyFileSync(resolve(out, 'index.html'), resolve(out, '404.html'));
+    },
   }],
   build: {
     rollupOptions: {

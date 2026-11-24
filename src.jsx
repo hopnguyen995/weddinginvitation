@@ -19,9 +19,22 @@ const QUERY = (() => {
   } catch { return new URLSearchParams(); }
 })();
 
+/* Phần đường dẫn sau link gốc: …/weddinginvitation/anh-nam  hoặc  …/weddinginvitation/nha-gai/anh-nam */
+const PATH = (() => {
+  try {
+    const base = import.meta.env.BASE_URL;
+    let p = decodeURIComponent(window.location.pathname);
+    if (p.startsWith(base)) p = p.slice(base.length);
+    const parts = p.split('/').map((x) => x.trim()).filter((x) => x && x !== 'index.html');
+    const bride = parts[0] && parts[0].toLowerCase() === 'nha-gai';
+    if (bride) parts.shift();
+    return { bride, name: parts.join(' ') };
+  } catch { return { bride: false, name: '' }; }
+})();
+
 const SIDE = (() => {
   try {
-    if (window.__SIDE__ === 'bride') return 'bride'; // trang /nha-gai/
+    if (window.__SIDE__ === 'bride' || PATH.bride) return 'bride'; // trang /nha-gai/
     const q = QUERY;
     return (q.get('side') || '').toLowerCase() === 'bride' || q.has('bride') ? 'bride' : 'groom';
   } catch { return 'groom'; }
@@ -110,8 +123,25 @@ const calendarUrl = () => {
 const VENUE_GEO = DATA.geo;
 const mapsUrl = `https://www.google.com/maps/dir/?api=1&destination=${VENUE_GEO}`;
 const mapEmbed = `https://maps.google.com/maps?q=${VENUE_GEO}&z=16&output=embed`;
-/* Tên khách mời lấy từ link: ?to=Anh%20Nam  →  "Thân Mời Anh Nam" */
-const GUEST = (() => { try { return (QUERY.get('to') || '').replace(/\s+/g, ' ').trim().slice(0, 80); } catch { return ''; } })();
+/* Tên khách mời lấy từ link — chỉ cần thêm ? và tên vào cuối link:
+ *   …/weddinginvitation/?anh nam      → "Thân Mời: Anh Nam"
+ *   …/weddinginvitation/?Anh_Nam      (_ hoặc + thay cho dấu cách)
+ *   …/nha-gai/?cô lan và gia đình     (thiệp nhà gái)
+ *   ?to=Anh+Nam                       (cách cũ, vẫn dùng được)
+ *   …/weddinginvitation/anh-nam       (không cần ?, - thay cho dấu cách)
+ * Tên gõ toàn chữ thường sẽ tự viết hoa chữ cái đầu mỗi từ. */
+const RESERVED = new Set(['side', 'site', 'bride', 'groom', 'to']);
+const GUEST = (() => {
+  try {
+    let name = QUERY.get('to') || PATH.name.replace(/-/g, ' ');
+    if (!name) {
+      for (const [k, v] of QUERY) { if (v === '' && !RESERVED.has(k.toLowerCase())) { name = k; break; } }
+    }
+    name = name.replace(/_/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 80);
+    if (name && name === name.toLowerCase()) name = name.replace(/(^|\s)(\S)/g, (m, sp, ch) => sp + ch.toUpperCase()).replace(/ (Và|Cùng) /g, (m, w) => ` ${w.toLowerCase()} `);
+    return name;
+  } catch { return ''; }
+})();
 
 /* Google Sheet nhận xác nhận & lời chúc: dán URL Web App (…/exec) của Apps Script vào đây. Để trống = chỉ lưu trên máy khách. */
 const SHEET_URL = 'https://script.google.com/macros/s/AKfycbwMM4F8Id4V2WVyhfDfIdAVRsIYMKtIfQ4muGiBmkuTyGQDScBA3G53JFeNX74q6sOYWA/exec';

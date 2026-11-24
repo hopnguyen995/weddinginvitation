@@ -58,7 +58,7 @@ const SIDES = {
     ceremony: { place: 'TIỆC CƯỚI SẼ DIỄN RA', time: '15:00', weekday: 'THỨ SÁU', day: '11', month: 'THÁNG 12', year: '2026', lunar: '(Tức ngày 3 tháng 11 năm Bính\u00a0Ngọ)' },
     party: { time: '15:00', weekday: 'THỨ SÁU', day: '11', month: 'THÁNG 12', year: '2026', lunar: '(Tức ngày 3 tháng 11 năm Bính\u00a0Ngọ)', start: '2026-12-11T15:00:00+07:00' },
     // Khung trắng phía dưới album: thông tin lễ
-    rite: { title: 'LỄ THÀNH HÔN', lead: 'Được cử hành vào\u00a0lúc', time: '10:30', weekday: 'THỨ BẢY', day: '12', month: 'THÁNG 12', year: '2026', lunar: '(Tức ngày 4 tháng 11 năm Bính\u00a0Ngọ)' },
+    rite: { title: 'LỄ THÀNH HÔN', address: 'Sân\u00a0Phủ\u00a0Quận\u00a0Công, Đông\u00a0Thành, Xã\u00a0Hát\u00a0Môn, Hà\u00a0Nội', lead: 'Được cử hành vào\u00a0lúc', time: '10:30', weekday: 'THỨ BẢY', day: '12', month: 'THÁNG 12', year: '2026', lunar: '(Tức ngày 4 tháng 11 năm Bính\u00a0Ngọ)' },
     announce: ['TRÂN TRỌNG KÍNH MỜI TỚI DỰ BỮA TIỆC', 'THÂN MẬT CÙNG GIA ĐÌNH CHÚNG TÔI'],
     venue: 'Sân Phủ Quận Công, Đông Thành, Xã Hát Môn, Hà Nội',
     venueText: 'Sân\u00a0Phủ\u00a0Quận\u00a0Công, Đông\u00a0Thành, Xã\u00a0Hát\u00a0Môn, Hà\u00a0Nội',
@@ -68,7 +68,7 @@ const SIDES = {
     dateLabel: '12 tháng 12, 2026',
     ceremony: { place: 'TIỆC CƯỚI SẼ DIỄN RA', time: '16:00', weekday: 'THỨ SÁU', day: '11', month: 'THÁNG 12', year: '2026', lunar: '(Tức ngày 3 tháng 11 năm Bính\u00a0Ngọ)' },
     party: { time: '16:00', weekday: 'THỨ SÁU', day: '11', month: 'THÁNG 12', year: '2026', lunar: '(Tức ngày 3 tháng 11 năm Bính\u00a0Ngọ)', start: '2026-12-11T16:00:00+07:00' },
-    rite: { title: 'LỄ VU QUY', lead: 'Được cử hành vào\u00a0lúc', time: '09:00', weekday: 'THỨ BẢY', day: '12', month: 'THÁNG 12', year: '2026', lunar: '(Tức ngày 4 tháng 11 năm Bính\u00a0Ngọ)' },
+    rite: { title: 'LỄ VU QUY', address: 'Tư\u00a0gia\u00a0nhà\u00a0gái', lead: 'Được cử hành vào\u00a0lúc', time: '09:00', weekday: 'THỨ BẢY', day: '12', month: 'THÁNG 12', year: '2026', lunar: '(Tức ngày 4 tháng 11 năm Bính\u00a0Ngọ)' },
     announce: ['TRÂN TRỌNG KÍNH MỜI TỚI DỰ BỮA TIỆC', 'THÂN MẬT CÙNG GIA ĐÌNH CHÚNG TÔI'],
     venue: 'Trung Tâm Văn Hoá - Thể Thao, Xã Hát Môn, Hà Nội',
     // Cách xuống dòng khi hiển thị: \u00a0 = dấu cách không ngắt dòng, \u2011 = gạch nối không ngắt
@@ -406,7 +406,7 @@ function Ceremony() {
           </div>
           <div className="when" style={{ fontFamily: F.bask }}>
             <div className="when__intro" style={{ color: W7 }}>
-              <span dir="auto" className="when__place">{c.place} VÀO&nbsp;LÚC</span>
+              <span dir="auto" className="when__place" style={{ fontSize: annSize }}>{c.place} VÀO&nbsp;LÚC</span>
             </div>
             <div className="when__time" style={{ color: W, fontFamily: F.bask }}>{c.time}, <D>{c.weekday}</D></div>
             <div className="when__row" style={{ color: W }}>
@@ -566,6 +566,7 @@ function Party({ y, onRsvp }) {
               <span className="when__side when__year-s" style={{ color: INK, fontFamily: F.times, textAlign: 'left', textTransform: 'uppercase' }}><D>{p.year}</D></span>
             </div>
             <div className="lunar" style={{ color: SAGE, fontFamily: F.bask }}>{p.lunar}</div>
+            {p.address && <div className="par__venue par__venue--rite" style={{ color: INK, fontFamily: F.bask }}><D>Tại {p.address}</D></div>}
             <div className="par__count">
               <h2 style={{ color: SAGE, fontFamily: F.bask }}><D>Cùng đếm&nbsp;ngược</D></h2>
               <div className="par__countval" style={{ color: SAGE, fontFamily: F.bask }}><Countdown /></div>

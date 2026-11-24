@@ -380,3 +380,6 @@ html.modal-open, html.modal-open body{overflow:hidden;overscroll-behavior:none}
 /* Số năm trông nhỏ hơn chữ in hoa có dấu ('THÁNG 12') nên phóng nhẹ để nhìn bằng nhau */
 .when__side.when__year-s{font-size:14px}
 @media (min-width:768px){.when__side.when__year-s{font-size:18px}}
+/* Địa chỉ trong khung Lễ thành hôn/Vu quy: cùng cỡ với 'Được cử hành vào lúc' */
+.par__venue.par__venue--rite{font-size:16px}
+@media (min-width:768px){.par__venue.par__venue--rite{font-size:20px}}
